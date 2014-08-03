@@ -1,14 +1,15 @@
 package main
 
 import (
-	"net/http"
-	"strings"
-	"encoding/json"
-	"io/ioutil"
-	"html/template"
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
+	"strings"
 )
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +49,10 @@ func Render(path string, params interface{}) ([]byte, error) {
 
 func main() {
 	http.HandleFunc("/views/", viewHandler)
+	if _, err := os.Stat("static"); err == nil {
+		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	}
+
 	log.Println("Listening on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
