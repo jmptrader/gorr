@@ -35,7 +35,7 @@ func Render(path string, params interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	compiledTemplate, err := template.New("template").Parse(string(content))
+	compiledTemplate, err := template.New("template").Funcs(funcMap).Parse(string(content))
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +45,18 @@ func Render(path string, params interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return out.Bytes(), nil
+}
+
+var funcMap = template.FuncMap{
+	"noescape": noEscape,
+}
+
+func noEscape(s interface{}) interface{} {
+	arg, isString := s.(string)
+	if isString {
+		return template.HTML(arg)
+	}
+	return s
 }
 
 func main() {
